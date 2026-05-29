@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CM Emballages – Plaquette Commerciale</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  :root {
+    --navy: #1B2A4A;
+    --navy-light: #243660;
+    --gold: #E8A020;
+    --gold-light: #F5C35A;
+    --white: #FFFFFF;
+    --off-white: #F7F5F0;
+    --gray: #8A8F9A;
+    --text: #2C2C2C;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Barlow', sans-serif; font-weight: 300; color: var(--text); background: var(--off-white); line-height: 1.7; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+    background: rgba(27,42,74,0.97); backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 64px;
+    border-bottom: 1px solid rgba(232,160,32,0.2);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; }
+  .nav-logo-icon {
+    width: 38px; height: 38px; background: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif; font-weight: 900; font-size: 13px; color: var(--navy);
+  }
+  .nav-logo-text { color: white; font-weight: 500; font-size: 15px; letter-spacing: 2px; text-transform: uppercase; }
+  .nav-links { display: flex; gap: 24px; align-items: center; }
+  .nav-links a {
+    color: rgba(255,255,255,0.7); text-decoration: none;
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .btn-pdf {
+    background: var(--gold); color: var(--navy); border: none; padding: 10px 22px;
+    font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1.5px;
+    text-transform: uppercase; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-pdf:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .btn-pdf.loading { opacity: 0.7; pointer-events: none; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; position: relative; overflow: hidden;
+    display: flex; align-items: center; padding: 100px 80px 80px;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background-image: url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1600&q=80');
+    background-size: cover; background-position: center;
+  }
+  .hero-bg::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(105deg, rgba(27,42,74,0.97) 45%, rgba(27,42,74,0.75) 100%);
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 600px; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 10px;
+    color: var(--gold); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; margin-bottom: 28px;
+  }
+  .hero-tag::before { content: ''; display: block; width: 30px; height: 1px; background: var(--gold); }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px, 5vw, 72px); font-weight: 700; color: white; line-height: 1.1; margin-bottom: 10px; }
+  .hero h1 span { color: var(--gold); display: block; }
+  .hero-sub { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 28px; }
+  .hero-desc { font-size: 16px; color: rgba(255,255,255,0.75); max-width: 500px; margin-bottom: 44px; line-height: 1.8; }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--gold); color: var(--navy); padding: 16px 36px;
+    font-weight: 700; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .hero-cta:hover { background: var(--gold-light); transform: translateX(4px); }
+  .hero-right {
+    position: absolute; right: 0; top: 64px; bottom: 0; width: 38%;
+    z-index: 2; display: flex; flex-direction: column;
+  }
+  .hero-img-top {
+    flex: 1;
+    background-image: url('https://scontent-los4-1.xx.fbcdn.net/v/t1.6435-9/181674813_4591889814160546_5146204245273779803_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=a5f93a&_nc_ohc=NmOffiVD--oQ7kNvwFovs7n&_nc_oc=Adpva45ShHXrEPABHnq54d3qao3SruZer_kElRPtwH7YWKABKyi6IIqcREDGcXQ-fAA&_nc_zt=23&_nc_ht=scontent-los4-1.xx&_nc_gid=bIE20_ztF4tnEeEc4w31Ew&_nc_ss=7b2a8&oh=00_Af5-zA8D-s8xHmaXJWbqulhneYA5sEGXLc9wiYckPL4EBQ&oe=6A40DAA8');
+    background-size: cover; background-position: center;
+    opacity: 0.5;
+  }
+  .hero-badges {
+    background: rgba(0,0,0,0.4); backdrop-filter: blur(12px);
+    display: flex; border-top: 1px solid rgba(232,160,32,0.2);
+  }
+  .badge { flex: 1; padding: 20px 16px; text-align: center; border-right: 1px solid rgba(232,160,32,0.15); }
+  .badge:last-child { border-right: none; }
+  .badge-num { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--gold); display: block; line-height: 1; }
+  .badge-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.5); display: block; margin-top: 5px; }
+
+  /* SECTIONS */
+  section { padding: 100px 80px; }
+  .section-label {
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gold); font-weight: 500; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::before { content: ''; display: block; width: 24px; height: 1px; background: var(--gold); }
+  h2 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 3.5vw, 46px); font-weight: 700; color: var(--navy); line-height: 1.15; margin-bottom: 16px; }
+  .lead { font-size: 16px; color: var(--gray); max-width: 620px; line-height: 1.8; margin-bottom: 56px; }
+  .divider { width: 56px; height: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); margin: 18px 0 44px; }
+
+  /* ABOUT */
+  #about { background: white; }
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .about-text p { margin-bottom: 18px; color: #555; font-size: 15px; }
+  .about-img {
+    width: 100%; aspect-ratio: 4/3; object-fit: cover;
+    margin-bottom: 24px; display: block;
+  }
+  .about-stat { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--off-white); border: 1px solid rgba(27,42,74,0.08); margin-top: 32px; }
+  .stat-item { background: white; padding: 24px; border-bottom: 1px solid rgba(27,42,74,0.06); }
+  .stat-item:nth-child(odd) { border-right: 1px solid rgba(27,42,74,0.06); }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 700; color: var(--navy); display: block; line-height: 1; }
+  .stat-desc { font-size: 11px; color: var(--gray); letter-spacing: 1px; margin-top: 5px; }
+  .credo-box { background: var(--navy); padding: 40px; position: relative; overflow: hidden; }
+  .credo-box::before { content: '"'; font-family: 'Playfair Display', serif; font-size: 160px; color: rgba(232,160,32,0.07); position: absolute; top: -20px; left: 8px; line-height: 1; pointer-events: none; }
+  .credo-box h3 { font-family: 'Playfair Display', serif; font-size: 21px; color: var(--gold); margin-bottom: 14px; }
+  .credo-box p { color: rgba(255,255,255,0.72); font-size: 14.5px; line-height: 1.8; }
+  .value-list { margin-top: 28px; display: flex; flex-direction: column; gap: 10px; }
+  .value-item { display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.75); font-size: 13.5px; }
+  .value-dot { width: 7px; height: 7px; background: var(--gold); flex-shrink: 0; transform: rotate(45deg); }
+
+  /* CHAÎNE */
+  #chaine { background: var(--off-white); }
+  .chaine-hero-img {
+    width: 100%; height: 220px; object-fit: cover; margin-bottom: 60px;
+    display: block;
+  }
+  .phase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: rgba(27,42,74,0.08); }
+  .phase-card { background: white; padding: 40px 30px; position: relative; overflow: hidden; transition: transform 0.3s; }
+  .phase-card:hover { transform: translateY(-4px); }
+  .phase-num { font-family: 'Playfair Display', serif; font-size: 80px; font-weight: 900; color: rgba(27,42,74,0.05); position: absolute; top: -10px; right: 12px; line-height: 1; pointer-events: none; }
+  .phase-icon { width: 50px; height: 50px; background: var(--navy); color: var(--gold); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+  .phase-icon svg { width: 22px; height: 22px; }
+  .phase-title { font-family: 'Playfair Display', serif; font-size: 19px; color: var(--navy); margin-bottom: 5px; }
+  .phase-sub { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 22px; }
+  .step-list { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+  .step-list li { font-size: 13px; color: #555; padding-left: 14px; position: relative; line-height: 1.5; }
+  .step-list li::before { content: ''; position: absolute; left: 0; top: 7px; width: 5px; height: 5px; background: var(--gold); transform: rotate(45deg); }
+  .step-list li strong { color: var(--navy); display: block; margin-bottom: 1px; font-size: 12.5px; }
+
+  /* PRODUITS */
+  #produits { background: white; padding-bottom: 0; }
+  .product-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-bottom: 0; }
+  .product-showcase-img {
+    width: 100%; height: 380px; object-fit: cover; display: block;
+  }
+  .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; background: rgba(27,42,74,0.06); }
+  .product-card { background: white; position: relative; overflow: hidden; transition: all 0.3s; }
+  .product-card:hover .product-card-img { transform: scale(1.04); }
+  .product-card-img { width: 100%; height: 200px; object-fit: cover; display: block; transition: transform 0.4s ease; }
+  .product-card-body { padding: 28px 28px 32px; }
+  .product-card.featured .product-card-body { background: var(--navy); }
+  .product-card h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); margin-bottom: 10px; }
+  .product-card.featured h3 { color: var(--gold-light); }
+  .product-card p { font-size: 13.5px; color: #666; line-height: 1.75; }
+  .product-card.featured p { color: rgba(255,255,255,0.65); }
+  .product-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 18px; }
+  .tag { padding: 4px 10px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; font-weight: 500; border: 1px solid rgba(27,42,74,0.15); color: var(--navy); }
+  .product-card.featured .tag { border-color: rgba(232,160,32,0.35); color: var(--gold); background: rgba(232,160,32,0.06); }
+
+  /* EQUIPE */
+  #equipe { background: var(--off-white); }
+  .team-layout { display: grid; grid-template-columns: 1fr 1.1fr; gap: 72px; align-items: start; }
+  .team-img { width: 100%; height: 240px; object-fit: cover; margin-bottom: 28px; display: block; }
+  .role-list { display: flex; flex-direction: column; gap: 2px; }
+  .role-item { background: white; padding: 16px 22px; display: flex; align-items: flex-start; gap: 14px; border-left: 3px solid transparent; transition: all 0.2s; }
+  .role-item:hover { border-left-color: var(--gold); }
+  .role-dot { width: 9px; height: 9px; background: var(--gold); flex-shrink: 0; border-radius: 50%; margin-top: 5px; }
+  .role-title { font-size: 13.5px; color: var(--navy); font-weight: 500; }
+  .role-desc { font-size: 11.5px; color: var(--gray); margin-top: 2px; }
+  .equip-section h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); margin-bottom: 20px; }
+  .equip-img { width: 100%; height: 200px; object-fit: cover; margin-bottom: 20px; display: block; }
+  .equip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .equip-card { background: var(--navy); padding: 24px 20px; border-bottom: 3px solid var(--gold); }
+  .equip-card h4 { color: var(--gold); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; font-weight: 500; }
+  .equip-card p { color: rgba(255,255,255,0.62); font-size: 12.5px; line-height: 1.65; }
+
+  /* PARTENAIRES */
+  #partenaires { background: white; }
+  .partner-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-bottom: 60px; }
+  .supply-box { background: var(--off-white); padding: 40px; border-left: 4px solid var(--gold); }
+  .supply-box h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); margin-bottom: 16px; }
+  .supply-box p { font-size: 14px; color: #555; line-height: 1.8; }
+  .supply-img { width: 100%; height: 100%; min-height: 260px; object-fit: cover; display: block; }
+  .partner-logos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: rgba(27,42,74,0.06); }
+  
+.partner-logo {
+  background: white;
+  padding: 20px;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  transition: all 0.25s ease;
+}
+
+.partner-logo:hover {
+  background: var(--off-white);
+  transform: translateY(-3px);
+}
+
+.partner-logo img {
+  width: 100%;
+  max-width: 120px;
+  height: 70px;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
+
+.partner-logo span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+  text-align: center;
+  line-height: 1.4;
+}
+
+
+  
+@media (max-width: 992px) {
+  .partner-logos {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .partner-logos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .partner-logo {
+    min-height: 140px;
+  }
+
+  .partner-logo img {
+    max-width: 90px;
+    height: 60px;
+  }
+}
+
+
+/* PRÉSENCE */
+  #presence { background: var(--navy); padding: 0; }
+  .presence-inner { display: grid; grid-template-columns: 1fr 1fr; }
+  .presence-img-col { position: relative; min-height: 500px; }
+  .presence-img-col img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.45; }
+  .presence-img-col::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 60%, var(--navy)); }
+  .presence-content { padding: 80px; display: flex; flex-direction: column; justify-content: center; }
+  .presence-content .section-label { color: var(--gold); }
+  .presence-content h2 { color: white; }
+  .presence-content .lead { color: rgba(255,255,255,0.55); margin-bottom: 36px; }
+  .country-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .country-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(232,160,32,0.12); padding: 20px 12px; text-align: center; transition: background 0.2s; }
+  .country-card:hover { background: rgba(232,160,32,0.06); }
+  .country-flag { font-size: 28px; margin-bottom: 8px; display: block; }
+  .country-name { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); }
+
+/* COMMANDE */
+  #commande { background: var(--navy); }
+  #commande h2 { color: white; }
+  #commande .section-label { color: var(--gold); }
+
+  .order-card {
+    background: white;
+    border-radius: 0;
+    padding: 48px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.25);
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .order-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .order-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .order-field label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  .order-field input,
+  .order-field select,
+  .order-field textarea {
+    font-family: 'Barlow', sans-serif;
+    font-size: 14.5px;
+    font-weight: 400;
+    color: var(--text);
+    background: #F7F5F0;
+    border: 1.5px solid rgba(27,42,74,0.12);
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    width: 100%;
+    border-radius: 0;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .order-field input:focus,
+  .order-field select:focus,
+  .order-field textarea:focus {
+    border-color: var(--gold);
+    background: white;
+  }
+
+  .order-field input::placeholder,
+  .order-field textarea::placeholder {
+    color: #b0b5be;
+  }
+
+  .order-field-full { grid-column: 1 / -1; }
+
+  .order-field textarea { resize: vertical; min-height: 120px; }
+
+  .order-select-wrap { position: relative; }
+  .order-select-wrap::after {
+    content: '▾';
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    color: var(--gold); pointer-events: none; font-size: 14px;
+  }
+
+  /* RÉCAPITULATIF */
+  .order-recap {
+    background: #F7F5F0;
+    border-left: 4px solid var(--gold);
+    padding: 28px 32px;
+    margin-top: 24px;
+  }
+
+  .order-recap h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--navy);
+    margin-bottom: 16px;
+  }
+
+  .recap-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 32px;
+  }
+
+  .recap-item { font-size: 13.5px; color: #555; }
+  .recap-item strong { color: var(--navy); font-weight: 600; }
+  .recap-item.full { grid-column: 1 / -1; }
+  .recap-val { color: var(--text); }
+
+  /* BOUTON WHATSAPP */
+  .btn-whatsapp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 28px;
+    background: var(--gold);
+    color: var(--navy);
+    padding: 18px 32px;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-whatsapp:hover { background: var(--gold-light); transform: translateY(-2px); }
+  .btn-whatsapp svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+  /* SUCCESS toast */
+  .toast {
+    position: fixed; bottom: 32px; right: 32px; z-index: 9000;
+    background: var(--navy); color: white;
+    padding: 16px 24px; font-size: 14px;
+    border-left: 4px solid var(--gold);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.4s ease;
+    max-width: 320px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 640px) {
+    .order-grid { grid-template-columns: 1fr; }
+    .recap-grid { grid-template-columns: 1fr; }
+    .order-card { padding: 28px 20px; }
+  }
+
+  /* CONTACT */
+  #contact { padding: 0; }
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; }
+  .contact-info { background: var(--navy); padding: 80px; }
+  .contact-info h2 { color: white; margin-bottom: 8px; }
+  .contact-info > p { color: rgba(255,255,255,0.55); font-size: 14.5px; margin-bottom: 40px; }
+  .contact-item { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 22px; }
+  .contact-icon { width: 34px; height: 34px; background: rgba(232,160,32,0.1); border: 1px solid rgba(232,160,32,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .contact-icon svg { width: 15px; height: 15px; color: var(--gold); }
+  .contact-text { color: rgba(255,255,255,0.75); font-size: 14px; line-height: 1.6; }
+  .contact-text strong { color: white; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 3px; }
+  .contact-map-col { position: relative; overflow: hidden; }
+  .contact-map-col img { width: 100%; height: 100%; object-fit: cover; display: block; min-height: 500px; filter: saturate(0.4) brightness(0.8); }
+  .contact-map-col .map-overlay {
+    position: absolute; bottom: 40px; left: 40px; right: 40px;
+    background: white; padding: 28px; text-align: center;
+  }
+  .contact-map-col .map-overlay h4 { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--navy); margin-bottom: 8px; }
+  .contact-map-col .map-overlay p { font-size: 13px; color: var(--gray); margin-bottom: 18px; line-height: 1.6; }
+  .contact-map-col .map-overlay a {
+    display: inline-block; background: var(--navy); color: white;
+    padding: 11px 22px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; transition: background 0.2s;
+  }
+  .contact-map-col .map-overlay a:hover { background: var(--gold); color: var(--navy); }
+  .social-row { display: flex; gap: 10px; margin-top: 28px; }
+  .soc-pill { padding: 9px 14px; background: rgba(232,160,32,0.1); border: 1px solid rgba(232,160,32,0.25); color: var(--gold); font-size: 11px; letter-spacing: 1px; }
+
+  /* FOOTER */
+  footer { background: #0F1D35; padding: 28px 80px; display: flex; align-items: center; justify-content: space-between; }
+  .footer-logo { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.45); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
+  .footer-logo-sq { width: 26px; height: 26px; background: var(--gold); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-weight: 900; font-size: 10px; color: var(--navy); }
+  .footer-right { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 1px; }
+
+  /* ANIMATIONS */
+  .fade-in { opacity: 0; transform: translateY(22px); transition: opacity 0.65s ease, transform 0.65s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--off-white); }
+  ::-webkit-scrollbar-thumb { background: var(--gold); }
+
+  /* PDF overlay */
+  #pdf-overlay {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(27,42,74,0.88); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; flex-direction: column; gap: 20px;
+  }
+  #pdf-overlay.active { display: flex; }
+  #pdf-overlay p { color: white; font-size: 16px; letter-spacing: 2px; text-transform: uppercase; }
+  .spinner { width: 44px; height: 44px; border: 3px solid rgba(232,160,32,0.3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+</style>
+</head>
+<body>
+<!-- Toast notification -->
+<div class="toast" id="toast">✓ Redirection vers WhatsApp…</div>
+
+
+
+
+
+
+<!-- PDF overlay -->
+<div id="pdf-overlay">
+  <div class="spinner"></div>
+  <p>Génération du PDF en cours…</p>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon">CM</div>
+    <span class="nav-logo-text">Emballages</span>
+  </div>
+  <div class="nav-links">
+    <a href="#about">À Propos</a>
+    <a href="#chaine">Processus</a>
+    <a href="#produits">Produits</a>
+    <a href="#equipe">Équipe</a>
+    <a href="#partenaires">Partenaires</a>
+    <a href="#commande">Commande</a>
+    <a href="#contact">Contact</a>
+    <button class="btn-pdf" id="exportBtn" onclick="exportPDF()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Exporter PDF
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Packaging Industriel · Bénin</div>
+    <h1>CM <span>Emballages</span></h1>
+    <p class="hero-sub">Fondée en 2020 · Cotonou, Bénin</p>
+    <p class="hero-desc">Entreprise industrielle spécialisée dans le carton ondulé, le carton simple et le papier. De la conception graphique à la livraison, nous gérons chaque étape de votre projet d'emballage.</p>
+    <a class="hero-cta" href="#about">
+      Découvrir notre univers
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+  <div class="hero-right">
+    <div class="hero-img-top"></div>
+    <div class="hero-badges">
+      <div class="badge"><span class="badge-num">5+</span><span class="badge-label">Ans d'expérience</span></div>
+      <div class="badge"><span class="badge-num">100+</span><span class="badge-label">Références</span></div>
+      <div class="badge"><span class="badge-num">70%</span><span class="badge-label">Clients fidèles</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- À PROPOS -->
+<section id="about">
+  <div class="about-grid fade-in">
+    <div class="about-text">
+      <div class="section-label">Notre Histoire</div>
+      <h2>Qui sommes-nous ?</h2>
+      <div class="divider"></div>
+      <p>CM Emballages a été créé en <strong>2020</strong> avec la vision d'apporter une approche différente et innovante du packaging au Bénin. Notre credo : rendre chaque partenaire <strong>UNIQUE</strong> à travers son emballage.</p>
+      <p>Nous mettons l'accent sur le <strong>Branding</strong> comme élément essentiel de différenciation. CM Emballages propose des solutions innovantes et originales, s'appuyant sur une connaissance approfondie et constamment actualisée du marché local et international.</p>
+      <p>Notre approche globale — création et logistique — permet de n'avoir qu'un seul interlocuteur pour l'ensemble de vos projets, avec des solutions « clefs en main ».</p>
+      <div class="about-stat">
+        <div class="stat-item"><span class="stat-num">2020</span><p class="stat-desc">Année de création</p></div>
+        <div class="stat-item"><span class="stat-num">70%</span><p class="stat-desc">CA avec clients fidèles</p></div>
+        <div class="stat-item"><span class="stat-num">100+</span><p class="stat-desc">Références produits</p></div>
+        <div class="stat-item"><span class="stat-num">5+</span><p class="stat-desc">Secteurs couverts</p></div>
+      </div>
+    </div>
+    <div>
+      <img class="about-img" src="https://scontent-los4-1.xx.fbcdn.net/v/t39.30808-6/273657982_5532499880099530_6472330516345788166_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=xyOxWq-c51EQ7kNvwHCyGil&_nc_oc=AdplQs-_V5MtuRF9JEnnnbZfOiuCTcPo_IX-L75s6ILjl5zZZtN82I6yFPLZEtbzrS0&_nc_zt=23&_nc_ht=scontent-los4-1.xx&_nc_gid=ewdSwZ0lB5n-hI2UZ8qe_Q&_nc_ss=7b2a8&oh=00_Af4hNYN3jm4C4JVa6NWv3J0YOMNPa8ynse3Ku2Ek3i4kZw&oe=6A1F1005" alt="Emballages carton personnalisés" loading="lazy">
+      <div class="credo-box">
+        <h3>Notre Philosophie</h3>
+        <p>La construction d'une collaboration différente et unique avec chacun de nos clients est au cœur de notre démarche. La satisfaction de nos partenaires est notre priorité absolue.</p>
+        <div class="value-list">
+          <div class="value-item"><div class="value-dot"></div><span>Boulangerie – Pâtisserie</span></div>
+          <div class="value-item"><div class="value-dot"></div><span>Restauration & Traiteur</span></div>
+          <div class="value-item"><div class="value-dot"></div><span>E-Commerce & Retail</span></div>
+          <div class="value-item"><div class="value-dot"></div><span>Artisanat & Cosmétique</span></div>
+          <div class="value-item"><div class="value-dot"></div><span>Industrie Agroalimentaire</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAÎNE GRAPHIQUE -->
+<section id="chaine">
+  <div class="fade-in">
+    <div class="section-label">Processus</div>
+    <h2>La Chaîne Graphique</h2>
+    <p class="lead">De l'idée à l'imprimé — un processus maîtrisé en trois phases complémentaires pour garantir un résultat à la hauteur de vos ambitions.</p>
+  </div>
+  <img class="chaine-hero-img fade-in" src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1400&q=80" alt="Conception graphique packaging" loading="lazy">
+  <div class="phase-grid fade-in">
+    <div class="phase-card">
+      <div class="phase-num">01</div>
+      <div class="phase-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </div>
+      <div class="phase-title">Édition</div>
+      <div class="phase-sub">Phase 1 — La Préparation</div>
+      <ul class="step-list">
+        <li><strong>Préparation du texte</strong>Récupérer, corriger, épurer le contenu éditorial.</li>
+        <li><strong>Préparation des visuels</strong>Réunir, vérifier les sources et les droits d'utilisation.</li>
+        <li><strong>Chemin de fer</strong>Définir, prévoir les pages et les dispositions générales.</li>
+        <li><strong>Brief créatif</strong>Communiquer l'ensemble des éléments au graphiste.</li>
+      </ul>
+    </div>
+    <div class="phase-card">
+      <div class="phase-num">02</div>
+      <div class="phase-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="13.5" cy="6.5" r="3.5"/><path d="M2 20c0-4 3.5-7 7-7h5c.5 0 1 0 1.5.1M17 14s1 1 1 2.5-1 2.5-1 2.5M21 14s1 1 1 2.5-1 2.5-1 2.5"/></svg>
+      </div>
+      <div class="phase-title">Graphisme</div>
+      <div class="phase-sub">Phase 2 — La Conception</div>
+      <ul class="step-list">
+        <li><strong>Réception & collecte</strong>Récolter les différents éléments constitutifs du projet.</li>
+        <li><strong>Analyse des données</strong>Se documenter, observer, cultiver les références.</li>
+        <li><strong>PAO créative</strong>Approfondir les idées, exploiter les logiciels, proposer.</li>
+        <li><strong>Finalisation</strong>Monter, dérouler, corriger, fournir les éléments pour l'impression.</li>
+      </ul>
+    </div>
+    <div class="phase-card">
+      <div class="phase-num">03</div>
+      <div class="phase-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      </div>
+      <div class="phase-title">Fabrication</div>
+      <div class="phase-sub">Phase 3 — L'Impression</div>
+      <ul class="step-list">
+        <li><strong>Prépresse</strong>Élaborer les formes d'impression, photogravure et imposition.</li>
+        <li><strong>Presse — Impression</strong>Choisir le papier, le format, imprimer et contrôler.</li>
+        <li><strong>Postpresse — Façonnage</strong>Relier, massicoter, pelliculer, vernir les finitions.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUITS -->
+<section id="produits">
+  <div class="fade-in">
+    <div class="section-label">Catalogue</div>
+    <h2>Nos Produits</h2>
+    <p class="lead">Plus de 100 références couvrant les besoins des secteurs de la boulangerie, restauration, e-commerce, artisanat et industrie agroalimentaire.</p>
+  </div>
+  <div class="product-grid fade-in">
+    <div class="product-card">
+      <img class="product-card-img" src="https://www.gentlepk.com/wp-content/uploads/2026/05/Custom-Cardboard-Boxes.jpg" alt="Boîtes carton personnalisées" loading="lazy">
+      <div class="product-card-body">
+        <h3>Boîtes Carton</h3>
+        <p>Emballages sur-mesure en carton pour la boulangerie, pâtisserie, cosmétique et détail. Personnalisables aux couleurs de votre marque.</p>
+        <div class="product-tags"><span class="tag">Carton Duplex</span><span class="tag">Kraft Blanc</span><span class="tag">Sur Mesure</span></div>
+      </div>
+    </div>
+    <div class="product-card featured">
+      <img class="product-card-img" src="https://papafrance.fr/img/ybc_blog/post/Le-sac-kraft-pas-cher-simpose-comme-un-incontournable.png" alt="Sacs kraft personnalisés" loading="lazy">
+      <div class="product-card-body">
+        <h3>Sacs Kraft & Carton</h3>
+        <p>Sacs papier kraft et carton brandés pour la restauration rapide, le retail et la vente à emporter. Naturels, blancs ou imprimés.</p>
+        <div class="product-tags"><span class="tag">Kraft Naturel</span><span class="tag">Kraft Blanc</span><span class="tag">Branding</span></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <img class="product-card-img" src="https://smartpack.me/wp-content/uploads/2023/05/carton_ondule-transformed-1024x683.jpeg" alt="Cartons ondulés expédition" loading="lazy">
+      <div class="product-card-body">
+        <h3>Cartons Ondulés</h3>
+        <p>Caisses et boîtes en carton ondulé pour l'expédition, le stockage et le transport. Haute résistance et personnalisation flexographique.</p>
+        <div class="product-tags"><span class="tag">Simple Cannelure</span><span class="tag">Double Cannelure</span><span class="tag">Export</span></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <img class="product-card-img" src="https://www.swisspackltd.com/wp-content/uploads/2024/04/Travel_Box_watch_rolled_wood3_Swisspack-e1712336500799-1300x800.png" alt="Coffrets et écrins premium" loading="lazy">
+      <div class="product-card-body">
+        <h3>Box, Coffrets & Écrins</h3>
+        <p>Emballages premium pour l'e-commerce, les cadeaux et les produits haut de gamme. Coffrets rigides et écrins personnalisés.</p>
+        <div class="product-tags"><span class="tag">Coffret Rigide</span><span class="tag">Écrin</span><span class="tag">Premium</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="commande">
+  <div class="fade-in" style="text-align:center; margin-bottom:52px;">
+    <div class="section-label" style="justify-content:center;">Commande</div>
+    <h2>Passez votre commande</h2>
+    <p class="lead" style="margin:16px auto 0; text-align:center; color:rgba(255,255,255,0.55);">
+      Remplissez le formulaire ci-dessous — votre commande sera envoyée directement sur WhatsApp.
+    </p>
+  </div>
+
+  <div class="order-card fade-in">
+    <div class="order-grid">
+
+      <!-- Nom -->
+      <div class="order-field">
+        <label for="ord-nom">Nom complet</label>
+        <input type="text" id="ord-nom" placeholder="Ex : Kouassi Jean" oninput="updateRecap()" />
+      </div>
+
+      <!-- Téléphone -->
+      <div class="order-field">
+        <label for="ord-tel">Téléphone</label>
+        <input type="tel" id="ord-tel" placeholder="Ex : +229 97 00 00 00" oninput="updateRecap()" />
+      </div>
+
+      <!-- Produit -->
+      <div class="order-field">
+        <label for="ord-produit">Produit souhaité</label>
+        <div class="order-select-wrap">
+          <select id="ord-produit" onchange="updateRecap()">
+            <option value="">— Choisir un produit —</option>
+            <option>Boîtes carton personnalisées</option>
+            <option>Sacs Kraft / Carton</option>
+            <option>Cartons ondulés</option>
+            <option>Box d'expédition / Coffrets / Écrins</option>
+            <option>Packaging personnalisé</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Quantité -->
+      <div class="order-field">
+        <label for="ord-qte">Quantité</label>
+        <input type="number" id="ord-qte" placeholder="Ex : 500" min="1" oninput="updateRecap()" />
+      </div>
+
+      <!-- Détails (pleine largeur) -->
+      <div class="order-field order-field-full">
+        <label for="ord-details">Détails supplémentaires</label>
+        <textarea id="ord-details" placeholder="Dimensions, couleurs, logo, délai souhaité…" oninput="updateRecap()"></textarea>
+      </div>
+
+    </div>
+
+    <!-- RÉCAPITULATIF -->
+    <div class="order-recap">
+      <h3>Récapitulatif de votre commande</h3>
+      <div class="recap-grid">
+        <div class="recap-item"><strong>Nom :</strong> <span class="recap-val" id="r-nom">—</span></div>
+        <div class="recap-item"><strong>Téléphone :</strong> <span class="recap-val" id="r-tel">—</span></div>
+        <div class="recap-item"><strong>Produit :</strong> <span class="recap-val" id="r-produit">—</span></div>
+        <div class="recap-item"><strong>Quantité :</strong> <span class="recap-val" id="r-qte">—</span></div>
+        <div class="recap-item full"><strong>Détails :</strong> <span class="recap-val" id="r-details">—</span></div>
+      </div>
+    </div>
+
+    <!-- BOUTON WHATSAPP -->
+    <a class="btn-whatsapp" id="wa-link" href="#" target="_blank" rel="noreferrer" onclick="return sendOrder()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+        <path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.549 4.103 1.508 5.836L.057 23.852a.5.5 0 00.614.614l6.018-1.451A11.93 11.93 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.956 9.956 0 01-5.085-1.385l-.363-.214-3.795.916.932-3.792-.236-.374A9.956 9.956 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+      </svg>
+      Envoyer la commande sur WhatsApp
+    </a>
+  </div>
+</section>
+
+<!-- ÉQUIPE & ÉQUIPEMENTS -->
+<section id="equipe">
+  <div class="fade-in">
+    <div class="section-label">Ressources</div>
+    <h2>Équipe & Équipements</h2>
+    <div class="divider"></div>
+  </div>
+  <div class="team-layout fade-in">
+    <div>
+      <img class="team-img" src="https://i0.wp.com/anthill.co.uk/wp-content/uploads/2021/09/The-10-Essential-Skills-For-Process-Management-Success-Banner.png?fit=1000%2C400&ssl=1" alt="Équipe CM Emballages au travail" loading="lazy">
+      <div class="role-list">
+        <div class="role-item"><div class="role-dot"></div><div><div class="role-title">Manager Général</div></div></div>
+        <div class="role-item"><div class="role-dot"></div><div><div class="role-title">Assistante Commerciale</div><div class="role-desc">Suivi des dossiers, coordination interne/externe, anticipation des besoins</div></div></div>
+        <div class="role-item"><div class="role-dot"></div><div><div class="role-title">Graphiste Designer</div><div class="role-desc">Conception des packagings, solutions innovantes et valorisation de l'image</div></div></div>
+        <div class="role-item"><div class="role-dot"></div><div><div class="role-title">Responsable de Production</div></div></div>
+        <div class="role-item"><div class="role-dot"></div><div><div class="role-title">Responsable Nouveaux Produits & Échantillons</div></div></div>
+        <div class="role-item"><div class="role-dot"></div><div><div class="role-title">Responsable des Stocks</div></div></div>
+        <div class="role-item"><div class="role-dot"></div><div><div class="role-title">Livreur + 4 Ouvriers Spécialisés</div></div></div>
+      </div>
+    </div>
+    <div class="equip-section">
+      <h3>Nos Équipements</h3>
+      <img class="equip-img" src="https://image.made-in-china.com/2f0j00FaRCQTZcJtos/New-Indoor-and-Outdoor-Eco-Solvent-Printing-Machine-1-9m-2-Heads-XP600-I3200.webp" alt="Machines d'impression industrielle" loading="lazy">
+      <div class="equip-grid">
+        <div class="equip-card"><h4>Impression Numérique</h4><p>Imprimante RICOH production — haute qualité, formats variés</p></div>
+        <div class="equip-card"><h4>Presse Offset</h4><p>Grandes séries, couleurs fidèles et rendus premium</p></div>
+        <div class="equip-card"><h4>Flexographie 4 Coul.</h4><p>Impression sur carton ondulé et kraft en grande série</p></div>
+        <div class="equip-card"><h4>Découpe & Sérigraphie</h4><p>Presse grand format + matériels de façonnage complets</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Numéro WhatsApp CM Emballages (+229 67 30 97 45)
+  const WA_NUMBER = '22967309745';
+
+  function val(id) {
+    return document.getElementById(id)?.value?.trim() || '';
+  }
+
+  function updateRecap() {
+    const fields = { nom: 'r-nom', telephone: 'r-tel', produit: 'r-produit', qte: 'r-qte', details: 'r-details' };
+    const ids    = { nom: 'ord-nom', telephone: 'ord-tel', produit: 'ord-produit', qte: 'ord-qte', details: 'ord-details' };
+    for (const key in ids) {
+      const v = val(ids[key]);
+      document.getElementById(fields[key]).textContent = v || '—';
+    }
+  }
+
+  function sendOrder() {
+    const nom      = val('ord-nom');
+    const tel      = val('ord-tel');
+    const produit  = val('ord-produit');
+    const qte      = val('ord-qte');
+    const details  = val('ord-details');
+
+    if (!nom || !tel || !produit) {
+      alert('⚠️ Merci de renseigner au minimum : Nom, Téléphone et Produit.');
+      return false;
+    }
+
+    const msg =
+      `🛒 *NOUVELLE COMMANDE — CM Emballages*\n\n` +
+      `👤 *Nom :* ${nom}\n` +
+      `📞 *Téléphone :* ${tel}\n` +
+      `📦 *Produit :* ${produit}\n` +
+      `🔢 *Quantité :* ${qte || 'Non précisée'}\n` +
+      `📝 *Détails :* ${details || 'Aucun'}\n\n` +
+      `_Message envoyé depuis la plaquette CM Emballages_`;
+
+    const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+    document.getElementById('wa-link').href = url;
+
+    // Afficher le toast
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+
+    return true; // laisse le lien s'ouvrir normalement
+  }
+</script>
+
+<!-- PARTENAIRES -->
+<section id="partenaires">
+  <div class="fade-in">
+    <div class="section-label">Réseau</div>
+    <h2>Approvisionnement & Partenaires</h2>
+    <div class="divider"></div>
+  </div>
+  <div class="partner-intro fade-in">
+    <div class="supply-box">
+      <h3>Nos Réseaux d'Approvisionnement</h3>
+      <p>Matières premières principalement du <strong>Nigéria</strong> (papier kraft, cartons ondulés, carton duplex couché), ainsi qu'au <strong>Togo</strong> et au <strong>Bénin</strong>. Machines de production fournies en <strong>Chine</strong>, avec une évolution prévue vers l'Allemagne et la Suède.</p>
+      <p style="margin-top:16px;">Notre proximité fournisseurs garantit un approvisionnement régulier et constant, sans risque de rupture de stocks.</p>
+    </div>
+    <img class="supply-img" src="https://corlet.fr/wp-content/uploads/2023/01/IMG_2313-1024x768.jpg" alt="Logistique et approvisionnement" loading="lazy">
+  </div>
+  <h3 style="font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); margin-bottom:24px;" class="fade-in">Quelques Partenaires</h3>
+  
+<div class="partner-logos fade-in">
+
+  <div class="partner-logo"><img src="https://www.childtochild.org.uk/wp-content/uploads/2017/02/unicef-logo-300x300.png" alt="UNICEF"><span>UNICEF</span></div>
+  <div class="partner-logo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ14NdPOL_IVVwNsXSA-bRro-a2RgKv9JMLHQ&s" alt="BSIC"><span>BSIC</span></div>
+  <div class="partner-logo"><img src="https://apbef.bj/wp-content/uploads/2016/07/logo-orabank.jpg" alt="Orabank"><span>Orabank</span></div>
+  <div class="partner-logo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQINNIK_oXaTrKSv0RwQV_w6VPxRCU5v8XVgQ&s" alt="Green Farm"><span>Green Farm</span></div>
+  <div class="partner-logo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQelr9GZIM31VL2SmzbkKiJ3YNvE79YTaSfbQ&s" alt="Natura"><span>Natura</span></div>
+  <div class="partner-logo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSu9uR66gJEElRaDR6c3LkYMXgtykHKmO0lxg&s" alt="Cake Addict"><span>Cake Addict</span></div>
+  <div class="partner-logo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFJFfS3f2Yc2KDgEKoKq5C34wSzWj1-6xx8Q&s" alt="Cornetto"><span>Cornetto</span></div>
+  <div class="partner-logo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCcl2fvql34WB9qJvDURVJeaoyPZNRhYh5Ig&s" alt="BSS Supermarché"><span>BSS Supermarché</span></div>
+  <div class="partner-logo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS52_QvWJIoGcSc5s5vXpM4yJvdNZZhLLV7iw&s" alt="La Fraise Africaine"><span>La Fraise Africaine</span></div>
+  <div class="partner-logo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKgjwpfKeOl7h3D93HG7rDrsDrUadKbeV0dA&s" alt="Africabaie"><span>Africabaie</span></div>
+
+</div>
+
+</section>
+
+<!-- PRÉSENCE -->
+<section id="presence" style="padding:0;">
+  <div class="presence-inner">
+    <div class="presence-img-col">
+      <img src="https://cdn.phototourl.com/free/2026-05-29-4b502a3d-44a1-446d-865f-bfbc110ca856.png" alt="Afrique de l'Ouest" loading="lazy">
+    </div>
+    <div class="presence-content fade-in">
+      <div class="section-label">Rayonnement</div>
+      <h2>Notre Présence</h2>
+      <p class="lead">CM Emballages rayonne au-delà du Bénin avec un réseau actif dans plusieurs pays d'Afrique et au-delà.</p>
+      <div class="country-grid">
+        <div class="country-card"><span class="country-flag">🇧🇯</span><div class="country-name">Bénin</div></div>
+        <div class="country-card"><span class="country-flag">🇸🇳</span><div class="country-name">Sénégal</div></div>
+        <div class="country-card"><span class="country-flag">🇲🇱</span><div class="country-name">Mali</div></div>
+        <div class="country-card"><span class="country-flag">🇨🇲</span><div class="country-name">Cameroun</div></div>
+        <div class="country-card"><span class="country-flag">🇨🇮</span><div class="country-name">Côte d'Ivoire</div></div>
+        <div class="country-card"><span class="country-flag">🇫🇷</span><div class="country-name">France</div></div>
+        <div class="country-card"><span class="country-flag">🇮🇳</span><div class="country-name">Inde</div></div>
+        <div class="country-card"><span class="country-flag">🇨🇳</span><div class="country-name">Chine</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" style="padding:0;">
+  <div class="contact-grid">
+    <div class="contact-info">
+      <div class="section-label">Coordonnées</div>
+      <h2>Parlons de votre projet</h2>
+      <p>Notre équipe est disponible pour discuter de vos besoins et vous accompagner vers les meilleures solutions d'emballage.</p>
+      <div class="contact-item">
+        <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.7A2 2 0 012 .99h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+        <div class="contact-text"><strong>Téléphone</strong>+229 67 30 97 45 / +229 98 15 15 98</div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div class="contact-text"><strong>Email</strong>cmemballages229@gmail.com</div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div class="contact-text"><strong>Showroom</strong>Abomey Calavi, Carrefour Bidossessi — en face du Magasin Orca Déco</div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div class="contact-text"><strong>Unité de Production</strong>Godomey Akogbato, Quartier Fignonhou — avant-dernière rue à droite avant le pont, Parcelle H</div>
+      </div>
+      <div class="social-row">
+        <div class="soc-pill">f CM Emballages</div>
+        <div class="soc-pill">📸 Cm.emballages</div>
+        <div class="soc-pill">🎵 @cmemballages</div>
+      </div>
+    </div>
+    <div class="contact-map-col">
+      <img src="https://cdn.phototourl.com/free/2026-05-29-279a55f3-f0b7-4b05-a0df-879079a6dc02.png" alt="Cotonou Bénin" loading="lazy">
+      <div class="map-overlay">
+        <h4>Nous Localiser</h4>
+        <p>Abomey Calavi, Carrefour Bidossessi<br>Cotonou, Bénin</p>
+        <a href="https://maps.app.goo.gl/Z7T8B4vcm8j5ZJkY8" target="_blank">Ouvrir dans Google Maps →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <div class="footer-logo-sq">CM</div>
+    CM Emballages Bénin
+  </div>
+  <div class="footer-right">© 2025 CM Emballages · Tous droits réservés · Cotonou, Bénin</div>
+</footer>
+
+<script>
+  // Scroll fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // PDF Export via html2pdf
+  function exportPDF() {
+    const overlay = document.getElementById('pdf-overlay');
+    const btn = document.getElementById('exportBtn');
+    overlay.classList.add('active');
+    btn.classList.add('loading');
+
+    // Make all fade-in elements visible for capture
+    document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+
+    const nav = document.querySelector('nav');
+    nav.style.display = 'none';
+    overlay.style.display = 'none';
+
+    const opt = {
+      margin: 0,
+      filename: 'CM_Emballages_Plaquette.pdf',
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        scrollY: 0,
+        windowWidth: 1200
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    html2pdf().set(opt).from(document.body).save().then(() => {
+      nav.style.display = '';
+      overlay.style.display = '';
+      overlay.classList.remove('active');
+      btn.classList.remove('loading');
+    }).catch(() => {
+      nav.style.display = '';
+      overlay.style.display = '';
+      overlay.classList.remove('active');
+      btn.classList.remove('loading');
+    });
+  }
+</script>
+</body>
+</html>
